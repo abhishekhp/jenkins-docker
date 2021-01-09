@@ -1,4 +1,4 @@
-ARG JENKINS_VER=lts
+ARG JENKINS_VER=lts-jdk11
 ARG JENKINS_REGISTRY=jenkins/jenkins
 FROM ${JENKINS_REGISTRY}:${JENKINS_VER}
 
@@ -15,8 +15,15 @@ RUN apt-get update \
      software-properties-common \
      vim \
      wget \
+     amazon-ecr-credential-helper \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+
+# install awscli
+RUN apt-get update \
+ && apt-get install python3-pip -y \
+ && pip3 install awscli --upgrade
 
 # install gosu for a better su+exec command
 ARG GOSU_VERSION=1.10
@@ -35,7 +42,7 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
      stable" \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    docker-ce-cli${DOCKER_CLI_VERSION} \
+    docker-ce-cli \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && groupadd -r docker \
